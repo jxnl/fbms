@@ -22,13 +22,16 @@ class FeatureData:
         return len(d)
 
     def count_phones(self):
-        return max(len(re.findall(PHONEREGEX, self.str)), 0)
+        return self.__max_of_iter(re.findall(PHONEREGEX, self.str))
 
     def count_sensitive_words(self):
-        return max(len(WATCHWORDS.intersection(set(self.str.split()))), 0)
+        return self.__max_of_iter(WATCHWORDS.intersection(set(self.str.split())))
 
     def capitalize_word_count(self):
-        return max(len(filter(lambda x: x.isupper(), self.str)), 0)
+        return self.__max_of_iter(filter(lambda x: x.isupper(), self.str))
+
+    def __max_of_iter(self, iterable):
+        return max(len(iterable), 0)
 
     def get_features(self):
         return [self.count_urls(),
