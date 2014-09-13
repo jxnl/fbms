@@ -1,12 +1,8 @@
 import facebook
+import facebook_api
 import requests
 
 from sets import Set
-
-import datetime
-from datetime import timedelta
-
-import dateutil.parser
 
 class QueueWriter:
     def __init__(self, access_token, group_id):
@@ -29,14 +25,19 @@ class QueueWriter:
 
         while True:
             if 'paging' in posts:
-                for post_raw in posts:
-                    post_id = post_raw["id"].split("_")[1]
+                for post_raw in posts['data']:
+                    post_id = post_raw['id'].split("_")[1]
                     if not post_id in self.ids_written:
-                        fb_post = facebook.FacebookPost(post_raw)
+                        fb_post = facebook_api.FacebookPost(post_raw)
 
-                        if fb_post and posts_added++ >= max_items:
-                            self.ids_written.add(post_id)
-                            queue.push(fb_post)
+                        if fb_post:
+                            posts_added = posts_added + 1
+
+                            if posts_added <= max_items:
+                                self.ids_written.add(post_id)
+                                queue.put(fb_post)
+                            else:
+                                return
                         else:
                             return
                     else:

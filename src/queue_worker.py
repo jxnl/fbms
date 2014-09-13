@@ -22,7 +22,8 @@ write_interval = 0.75
 def take_action(queue):
     while True:
         fb_entity = queue.get()
-        # Do the shit
+        # Do the shit - JSON HERE
+        print "got {}".format(fb_entity.contents)
         queue.task_done()
 
 # Spawn up the workers
