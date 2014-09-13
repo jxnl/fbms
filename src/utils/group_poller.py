@@ -48,7 +48,7 @@ class FacebookPost:
         try:
             self.contents = post['message']
         except KeyError:
-            return # It'll just return nil if nothing exists
+            self.contents = ""
 
         self.comments = list()
 
