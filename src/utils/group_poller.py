@@ -15,7 +15,7 @@ class GroupPoller:
         for post in all_posts:
             print post.post_id + "||" + post.contents.replace("\n", " ")
 
-    def paginate_all(self):
+    def paginate_all(self, max_results=100):
         all_posts = list()
         posts = self.graph.get_connections(self.group_id, "feed")
 
@@ -25,7 +25,11 @@ class GroupPoller:
                 for post in posts['data']:
                     fb_post = FacebookPost(post)
                     if fb_post:
-                        all_posts.append(fb_post)
+                        # Stop returning an infinite result after the max_results is reached
+                        if len(all_posts) > max_results - 1:
+                            return all_posts
+                        else:
+                            all_posts.append(fb_post)
 
                 posts = requests.get(posts['paging']['next']).json()
             else:
