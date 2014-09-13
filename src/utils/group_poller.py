@@ -88,12 +88,5 @@ class FacebookComment:
         self.contents = comment_raw['message']
         self.like_count = comment_raw['like_count']
 
-
-if __name__ == "__main__":
-
-    gp = GroupPoller(access_token, '369653806521044')
-    gp.paginate_top()
-    for p in gp.all_posts:
-        p.post_comment("FUCKSHIT#STACKED")
-
-
+    def post_comment(self, body):
+        self.parent_post.post_comment(body)
