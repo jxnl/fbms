@@ -37,9 +37,9 @@ class FacebookPost:
         self.poster = post['from']
         self.contents = post['message']
         
-    def post_comment(body, post_id):
+    def post_comment(self, body, post_id):
         r = requests.post('https://graph.facebook.com/v2.1/' + post_id + '/comments?access_token=' + access_token + '&message=' + body)
-        r.json()
+        return r.json()
 
 gp = GroupPoller(access_token, '298947700283856')
 gp.paginate_top()
