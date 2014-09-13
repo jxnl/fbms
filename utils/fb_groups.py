@@ -13,8 +13,7 @@ class GroupPoller:
         all_posts = (FacebookPost(post) for post in posts['data'])
 
         for post in all_posts:
-            print post.id_ + " (" + post.from_['name'] + ")\n" + post.message_
-            print "______________________________________"
+            print post.id_ + "||" + post.message_.replace("\n", " ")
 
 class FacebookPost:
     def __init__(self, post):
