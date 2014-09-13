@@ -23,7 +23,8 @@ def take_action(queue):
     while True:
         fb_entity = queue.get()
         # Do the shit - JSON HERE
-        print "got {}".format(fb_entity.contents)
+        print "got a post! {}".format(fb_entity.contents)
+        fb_entity.post_comment("Hello, you said: {}".format(fb_entity.contents), access_token)
         queue.task_done()
 
 # Spawn up the workers
