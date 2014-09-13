@@ -20,8 +20,7 @@ class GroupPoller:
         #for post in all_posts:
         #    print post.post_id + "||" + post.contents.replace("\n", " ")
 
-    def paginate_all(self, max_results=100, max_delta=timedelta(0, 1)):
-        start = datetime.datetime.utcnow()
+    def paginate_all(self, max_results=100, last_tick=0):
         all_posts = list()
         posts = self.graph.get_connections(self.group_id, "feed")
 
@@ -35,8 +34,12 @@ class GroupPoller:
                         if len(all_posts) > max_results - 1:
                             return all_posts
                         else:
-                            if (start - fb_post.created_at) > max_delta:
+                            # If the time that the post was created was /earlier/ then the last thing we've seen
+                            # discard it and return what we have.
+                            if fb_post.created_at < last_tick:
                                 return all_posts
+                            # Otherwise, we should know about it because it was created within the time that we
+                            # last checked things out, so we should add it and then keep going
                             else:
                                 all_posts.append(fb_post)
 
