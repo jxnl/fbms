@@ -13,23 +13,22 @@ PHONEREGEX = "(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9
 PUNCREGEX = "[*=-_$%#@~`]"
 WATCHWORDS = pickle.loads(open("watchwords.pickle").read())
 
+class FeatureData:
+    def __init__(self, str):
+        self.str = str
 
-def countURL(data):
-    d = re.findall(URLREGEX, data)
-    return len(d)
+    def count_urls(self):
+        d = re.findall(URLREGEX, self.str)
+        return len(d)
 
+    def count_phones(self):
+        return max(len(re.findall(PHONEREGEX, self.str)), 0)
 
-def countPhones(data):
-    return max(len(re.findall(PHONEREGEX, data)), 0)
+    def punct_ratio(self):
+        return max(len(re.findall(PUNCREGEX, self.str)) / len(self.str), 0)
 
+    def count_sensitive_words(self):
+        return max(len(WATCHWORDS.intersection(set(self.str.split()))), 0)
 
-def punctuationRatio(data):
-    return max(len(re.findall(PUNCREGEX, data)) / len(data), 0)
-
-
-def numberOfSensitiveWords(data):
-    return max(len(WATCHWORDS.intersection(set(data.split()))), 0)
-
-
-def capitalizedWordCount(data):
-    return max(len([w for w in data.split() if w.isupper()]), 0)
+    def get_features(self):
+        return [self.count_urls(), self.count_phones(), self.punct_ratio(), self.count_sensitive_words()]
