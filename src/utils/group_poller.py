@@ -17,6 +17,18 @@ class GroupPoller:
         for post in all_posts:
             print post.post_id + "||" + post.contents.replace("\n", " ")
 
+    def paginate_all(self):
+        posts = self.graph.get_connections(self.group_id, "feed")
+
+        while True:
+            try:
+                for post in posts['data']:
+                    FacebookPost(post)
+
+                posts = requests.get(posts['paging']['next']).json()
+            except KeyError:
+                break
+
 class FacebookPost:
     def __init__(self, post):
         self.group_id = post['id'].split("_")[0]
