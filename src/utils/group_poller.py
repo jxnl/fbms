@@ -13,14 +13,15 @@ class GroupPoller:
         all_posts = (FacebookPost(post) for post in posts['data'])
 
         for post in all_posts:
-            print post.id_ + "||" + post.message_.replace("\n", " ")
+            print post.post_id + "||" + post.contents.replace("\n", " ")
 
 class FacebookPost:
     def __init__(self, post):
-        keys = ['id', 'from', 'message']
+        self.group_id = post['id'].split("_")[0]
+        self.post_id = post['id'].split("_")[1]
 
-        for key in keys:
-            setattr(self, key + '_', post[key])
+        self.poster = post['from']
+        self.contents = post['message']
 
 gp = GroupPoller('CAACEdEose0cBAK06LI4q47krSNnrous4jgIbV15eEXKdLgMiEjrnsG1lzb9wG5U8bKYJk8GS4F0O7RJ8goPQ570fWZC709qrj32jHXFl0PrBJVi2ZByZB0WVdI3W658BeLzw3CJl9SQ9gAu6ycW2NCQuimh16V5PRmcc8YkZAvOaNlrMZAwODBV1y89hEo8JxPfB37vUA2hMkfXRD7sOq', '298947700283856')
 gp.paginate_top()
