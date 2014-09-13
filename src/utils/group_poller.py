@@ -1,6 +1,10 @@
 import facebook
 import requests
 
+import datetime
+from datetime import timedelta
+import dateutil.parser
+
 class GroupPoller:
     def __init__(self, access_token, group_id):
         self.access_token = str(access_token)
@@ -15,7 +19,8 @@ class GroupPoller:
         for post in all_posts:
             print post.post_id + "||" + post.contents.replace("\n", " ")
 
-    def paginate_all(self, max_results=100):
+    def paginate_all(self, max_results=100, max_delta=timedelta(0, 1)):
+        start = datetime.datetime.utcnow()
         all_posts = list()
         posts = self.graph.get_connections(self.group_id, "feed")
 
@@ -29,7 +34,10 @@ class GroupPoller:
                         if len(all_posts) > max_results - 1:
                             return all_posts
                         else:
-                            all_posts.append(fb_post)
+                            if (start - fb_post.created_at) > max_delta:
+                                return all_posts
+                            else:
+                                all_posts.append(fb_post)
 
                 posts = requests.get(posts['paging']['next']).json()
             else:
@@ -39,6 +47,8 @@ class GroupPoller:
 
 class FacebookPost:
     def __init__(self, post):
+        self.created_at = dateutil.parser.parse(post['created_time']).replace(tzinfo=None)
+
         self.group_id = post['id'].split("_")[0]
         self.post_id = post['id'].split("_")[1]
 
