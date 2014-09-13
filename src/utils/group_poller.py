@@ -1,8 +1,6 @@
 import facebook
 import requests
 
-access_token = "CAACEdEose0cBAOKcwPISS7FEOlEe5qZBJFVOT9rTKlf0RYFYeFX0NputJJt3AeztZAOX1N4pOQ64DriyLiZAtVB4JZA3HjC6BxzY6ZAHSDyykhur2isg5k4aMXZAQfkISYnN78ZBcSu9KdBUEIvOaoA1VicYCSjalFXsL2t1jAmMrTZAkSJV11BOqgELbH38QL1ZAqZBf1xQrn3amQ6IEkwxqX"
-
 class GroupPoller:
     def __init__(self, access_token, group_id):
         self.access_token = str(access_token)
@@ -66,6 +64,3 @@ class FacebookComment:
         self.poster = comment_raw['from']
         self.contents = comment_raw['message']
         self.like_count = comment_raw['like_count']
-
-gp = GroupPoller(access_token, '759985267390294')
-all_posts = gp.paginate_all()
