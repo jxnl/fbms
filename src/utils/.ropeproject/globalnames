@@ -1,5 +1,7 @@
-€}q(U
-processing]qUListMapDictqaUlistmap]qUListMapqaUfeatures]q(U
-PHONEREGEXqUURLREGEXqUcountPhonesq	UpunctuationRatioq
-U	PUNCREGEXqU
-WATCHWORDSqUcountURLqUcapitalizedWordCountqUnumberOfSensitiveWordsqeu.
+€}q(Utraining_spam]q(UX_testqUtesting_dataqUiUdataqUclfqUspam_classiferqUyUtraining_dataqUXUy_testq	eUfeatures]q
+(U
+PHONEREGEXqUURLREGEXqUcountPhonesqUpunctuationRatioqU	PUNCREGEXqU
+WATCHWORDSqUcountURLqUcapitalizedWordCountqUnumberOfSensitiveWordsqeUfeature_data]q(U
+PHONEREGEXqUURLREGEXqUFeatureDataqU	PUNCREGEXqU
+WATCHWORDSqeU
+processing]qUListMapDictqaUlistmap]qUListMapqau.
