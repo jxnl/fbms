@@ -47,10 +47,25 @@ class FacebookPost:
             self.contents = post['message']
         except KeyError:
             return # It'll just return nil if nothing exists
-        
+
+        self.comments = list()
+
+        # Some posts also don't have any comments
+        if 'comments' in post:
+            for comment in post['comments']['data']:
+                self.comments.append(FacebookComment(self, comment))
+
     def post_comment(self, body, post_id):
         r = requests.post('https://graph.facebook.com/v2.1/' + post_id + '/comments?access_token=' + access_token + '&message=' + body)
         return r.json()
+
+class FacebookComment:
+    def __init__(self, parent_post, comment_raw):
+        self.parent_post = parent_post
+
+        self.poster = comment_raw['from']
+        self.contents = comment_raw['message']
+        self.like_count = comment_raw['like_count']
 
 gp = GroupPoller(access_token, '759985267390294')
 all_posts = gp.paginate_all()
