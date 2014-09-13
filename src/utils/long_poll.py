@@ -15,7 +15,7 @@ delay = timedelta(0, 1)
 last_tick = datetime.datetime.utcnow()
 
 while True:
-    new_posts = gp.paginate_all(max_delta=delay)
+    new_posts = gp.paginate_all(last_tick=last_tick)
 
     print len(new_posts)
 
