@@ -57,8 +57,21 @@ strong {
   border-radius: 3px;
   padding: 30px 30px;
   color: #515151;
-  line-height: 17px; }
+  line-height: 17px;
+  margin-bottom: 20px; }
 
 #robot {
   float: left;
   margin-top: -10px; }
+
+.spam {
+  border-style: solid;
+  border-top: thick solid #e74c3c; }
+
+.good {
+  border-style: solid;
+  border-top: thick solid #2ecc71; }
+
+.maybe {
+  border-style: solid;
+  border-top: thick solid #f1c40f; }

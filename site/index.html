@@ -9,7 +9,7 @@
 <body>
 
   <nav>
-  <div class="container">
+    <div class="container">
       <div id="logo-area">
         <img id="robot" src="/img/robot@2x.png" alt="" width="59px" height="64px">
         <span>Mark Sweep</span>
@@ -22,15 +22,53 @@
       </div>
     </div>
   </nav>
-  <div class="container">
-    <h2 class="center">Recent Posts Inspected in <strong>Hackathon Hackers</strong></h2>
-    <div class="post"><strong>Post content</strong><br>
-Can anyone help me out real quick? I'm trying to make an app that measures speed, but my iPod Touch 5th gen doesn't have GPS. I need you to test this project and see if it works on your iPhone. ~ by Henry Boldizsar
-
-<br><br><strong>Action Taken</strong><br>
-Commented on post
-</div>
+  <div class="container" id="content">
+    <h2 class="center">
+      Recent Posts Inspected in <strong>Hackathon Hackers</strong>
+    </h2>
   </div>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script>
+  // AJAX Request: My API (7) (http://localhost:3000/collections/logs)
+(function poll() {
+   setInterval(function(){
+$.ajax({
+  url: "http://localhost:3000/collections/logs",
+  type: "GET",
+  timeout: 30000,
 
+  // Success Callback: http://localhost:3000/collections/logs
+
+  success:function(data, textStatus) {
+    // console.log("Received response HTTP "+textStatus+" (http://localhost:3000/collections/logs)");
+    // console.log(data);
+    for (var i = 0; i < data.length; i++) {
+      if (i == 0) {
+        $('#content').html('<h2 class="center"> Recent Posts Inspected in <strong>Hackathon Hackers</strong> </h2>');
+      }
+      // console.log(data[i]);
+      if (data[i].status == 'spam'){
+         $('#content').append(' <div class="post spam"> <strong>Post content</strong> <br> ' + data[i].content + ' ~ by ' + data[i].name.name + ' <br> <br> <strong>Action Taken</strong> <br>' + data[i].status + '</div>');
+       } else if (data[i].status == 'maybe_off_topic') {
+          $('#content').append(' <div class="post maybe"> <strong>Post content</strong> <br> ' + data[i].content + ' ~ by ' + data[i].name.name + ' <br> <br> <strong>Action Taken</strong> <br>' + data[i].status + '</div>');
+       } else {
+          $('#content').append(' <div class="post good"> <strong>Post content</strong> <br> ' + data[i].content + ' ~ by ' + data[i].name.name + ' <br> <br> <strong>Action Taken</strong> <br>' + data[i].status + '</div>');
+       }
+    };
+  },
+
+  // Error Callback: http://localhost:3000/collections/logs
+
+  error:function(jqXHR, textStatus, errorThrown) {
+    console.log("Error during request "+textStatus+" (http://localhost:3000/collections/logs)");
+    console.log(errorThrown);
+  },
+});
+
+}, 1000);
+})();
+
+
+</script>
 </body>
 </html>
