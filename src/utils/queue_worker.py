@@ -18,10 +18,10 @@ print "\n-----------------"
 # Some constants, creates the queue and the workers
 queue = Queue(maxsize=0)
 num_workers = 8
-write_interval = 1.75
+write_interval = 3.5
 clf = Classifier()
 
-spam_threshold = .95
+spam_threshold = .90
 
 
 # Defines the action that will be taken on a given piece of data
@@ -39,15 +39,16 @@ def take_action(queue):
 
         if not already_commented:
             if t['spam'][1] > spam_threshold:
-                fb_entity.post_comment('Hey! It looks like this post is\
+                percent_spam = "%.2f" % (t['spam'][1] * 100)
+                fb_entity.post_comment("Hey! I\'m {}% sure this is\
                     probably spam, and has been marked for deletion. Please\
                     try and remain on topic for the discussion in this\
-                    group!', access_token)
+                    group!".format(percent_spam), access_token)
             elif int(t['ontopic']) == 1:
                 fb_entity.post_comment('Hey, this post is on-topic with the\
                     discussion of the group.  Grats on a great post! (y)',
                     access_token)
-            elif t['spam'][1] > 80:
+            elif t['spam'][1] > .80:
                 fb_entity.post_comment(':( We\'re not sure if this post\
                     belongs.  It looks like spam, but not entirely.  We\'re\
                     not sure!', access_token)
