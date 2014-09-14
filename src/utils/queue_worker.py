@@ -1,9 +1,12 @@
+from pymongo import MongoClient
 import queue_writer
 import time
 
 from Queue import Queue
 from threading import Thread
 from processing import Classifier
+
+
 
 # Define the access tokens and group_ids
 access_token = "CAAK5npFF7MYBACPwdYQRuqHwmQj18YsRDdkUiU1WfyHvs2a5AaNzyNihyqXg1\
@@ -23,6 +26,11 @@ clf = Classifier()
 
 spam_threshold = .90
 
+# mongo connection
+client = MongoClient("mongodb://marksweep:pennapps@ds035300.mongolab.com:35300/marksweep")
+db = client['marksweep']
+logs = db['logs']
+
 
 # Defines the action that will be taken on a given piece of data
 def take_action(queue):
@@ -31,6 +39,11 @@ def take_action(queue):
         msg = fb_entity.contents
         t = clf.process(msg)
 
+        t['name'] = fb_entity.poster
+        t['content'] = fb_entity.contents
+        t['pid'] = fb_entity.post_id
+        t['gid'] = fb_entity.group_id
+
         already_commented = False
         for comment in fb_entity.comments:
             if comment.poster['name'] == "Mark Sweep":
@@ -38,27 +51,35 @@ def take_action(queue):
                 break
 
         if not already_commented:
+            percent_spam = "%.2f" % (t['spam'][1] * 100)
+            t['spam_confidence'] =  percent_spam
             if t['spam'][1] > spam_threshold:
-                percent_spam = "%.2f" % (t['spam'][1] * 100)
                 fb_entity.post_comment("Hey! I\'m {}% sure this is\
                     probably spam, and has been marked for deletion. Please\
                     try and remain on topic for the discussion in this\
                     group!".format(percent_spam), access_token)
+                t['status'] = "spam"
             else:
                 if int(t['ontopic']) == 1:
-                    fb_entity.post_comment('Hey, this post is on-topic with the\
-                        discussion of the group.  Grats on a great post! (y)',
+                    fb_entity.post_comment('Hey, {}!  This post is on-topic\
+                        with the discussion of the group.  Grats on a great\
+                        post! (y)'.format(fb_entity.poster['name'].split(" ")[0]),
                         access_token)
+                    t['status'] = "on_topic"
                 elif t['spam'][1] > .80:
                     fb_entity.post_comment(':( We\'re not sure if this post\
                         belongs.  It looks like spam, but not entirely.  We\'re\
                         not sure!', access_token)
+                    t['status'] = "maybe_spam"
                 else:
                     fb_entity.post_comment('Uh-oh! This post doesn\'t appear\
                         to be on-topic with the rest of the group. Please keep\
                         discussion focused on the topic of the group.',
                         access_token)
+                    t['status'] = "maybe_off_topic"
 
+        del t['spam']
+        logs.insert(t)
         queue.task_done()
 
 # Spawn up the workers
