@@ -54,10 +54,7 @@ def take_action(queue):
             percent_spam = "%.2f" % (t['spam'][1] * 100)
             t['spam_confidence'] =  percent_spam
             if t['spam'][1] > spam_threshold:
-                fb_entity.post_comment("Hey! I\'m {}% sure this is\
-                    probably spam, and has been marked for deletion. Please\
-                    try and remain on topic for the discussion in this\
-                    group!".format(percent_spam), access_token)
+                fb_entity.post_comment("Hey! I\'m {}% sure this is probably spam, and has been marked for deletion. Please try and remain on topic for the discussion in this group!".format(percent_spam), access_token)
                 t['status'] = "spam"
             else:
                 if int(t['ontopic']) == 1:
@@ -77,9 +74,9 @@ def take_action(queue):
                         discussion focused on the topic of the group.',
                         access_token)
                     t['status'] = "maybe_off_topic"
+            del t['spam']
+            logs.insert(t)
 
-        del t['spam']
-        logs.insert(t)
         queue.task_done()
 
 # Spawn up the workers
