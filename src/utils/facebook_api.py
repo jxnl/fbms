@@ -1,7 +1,6 @@
 import dateutil.parser
 import requests
 
-
 class FacebookPost:
     def __init__(self, post):
         self.created_at = dateutil.parser.parse(post['created_time']).replace(tzinfo=None)

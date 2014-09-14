@@ -42,4 +42,5 @@ class QueueWriter:
                             return
                     else:
                         return
+
                 posts = requests.get(posts['paging']['next']).json()

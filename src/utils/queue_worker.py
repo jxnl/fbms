@@ -16,8 +16,9 @@ print "\n-----------------"
 # Some constants, creates the queue and the workers
 queue = Queue(maxsize=0)
 num_workers = 8
-write_interval = 0.75
-clf = Classifier()
+write_interval = 1.75
+print list(processing._processing.__dict__.keys())
+# clf = processing.Classifier()
 
 
 # Defines the action that will be taken on a given piece of data
@@ -29,16 +30,17 @@ def take_action(queue):
         msg = fb_entity.content
         t = clf.process(msg)
 
-        if t['spam'][1] > .95:
-            fb_entity.delete_post(access_token)
-        elif t['spam'] > 80 and not t['ontopic']:
-            fb_entity.post_comment('This post has been mark suspecious',
-                                   access_token)
-        else:
-            pass
+        # if t['spam'][1] > .95:
+        #     fb_entity.delete_post(access_token)
+        # elif t['spam'] > 80 and not t['ontopic']:
+        #     fb_entity.post_comment('This post has been mark suspecious',
+        #                            access_token)
+        # else:
+        #     pass
 
-        fb_entity.post_comment("Hello, you said: {}".format(fb_entity.contents),
-                               access_token)
+        # fb_entity.post_comment("Hello, you said: {}".format(fb_entity.contents),
+        #                        access_token)
+
         queue.task_done()
 
 # Spawn up the workers
