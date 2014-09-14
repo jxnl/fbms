@@ -30,12 +30,15 @@ SGD = Pipeline([
     ('tfidf', TfidfTransformer()),
     ('clf', SGDClassifier())])
 
-SGD.set_params(vect__max_df=0.5,
+SGD.set_params(vect__max_df=0.2,
                vect__max_features=None,
-               vect__ngram_range=(1, 2),
+               vect__ngram_range=(1, 1),
                clf__alpha=1e-05,
                clf__penalty='l2',
+               clf__class_weight='auto',
                tfidf__use_idf=True).fit(t_data['data'], t_data['target'])
+
+print(SGD.score(X_test, y_test))
 
 with open("topic_classifier.pickle", 'w+') as tc:
     pickle.dump(SGD, tc)

@@ -17,7 +17,7 @@ X_test = np.ndarray((len(testing_data.spam), 4))
 for i, data in enumerate(testing_data.contents):
     X_test[i] = np.array(FeatureData(data).get_features())
 
-clf = svm.SVC(class_weight='auto')
+clf = svm.SVC(class_weight='auto', probability=True)
 clf.fit(X, y)
 print clf.score(X_test, y_test)
 
