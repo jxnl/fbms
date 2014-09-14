@@ -1,10 +1,4 @@
-"""
-Series of functions to obtain features for the spam detector.
-    params: data (str)
-"""
-
 from __future__ import division
-from nltk.corpus import stopwords
 import pickle
 import re
 
@@ -13,7 +7,12 @@ PHONEREGEX = "(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9
 PUNCREGEX = "[*=-_$%#@~`]"
 WATCHWORDS = pickle.loads(open("watchwords.pickle").read())
 
+
 class FeatureData:
+    """
+    Series of functions to obtain features for the spam detector.
+        params: data (str)
+    """
     def __init__(self, str):
         self.str = str
 
@@ -25,7 +24,8 @@ class FeatureData:
         return self.__max_of_iter(re.findall(PHONEREGEX, self.str))
 
     def count_sensitive_words(self):
-        return self.__max_of_iter(WATCHWORDS.intersection(set(self.str.split())))
+        return self.__max_of_iter(WATCHWORDS.intersection(
+            set(self.str.split())))
 
     def capitalize_word_count(self):
         return self.__max_of_iter(filter(lambda x: x.isupper(), self.str))
