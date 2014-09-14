@@ -24,10 +24,12 @@ class FacebookPost:
                 self.comments.append(FacebookComment(self, comment))
 
     def post_comment(self, body, access_token):
+        print 'Posting a comment in thread: {}'.format(self.post_id)
         r = requests.post('https://graph.facebook.com/v2.1/' + self.post_id + '/comments?access_token=' + access_token + '&message=' + body)
         return r.json()
 
     def delete_post(self, access_token):
+        print 'Deleting post with ID: {}'.format(self.post_id)
         r = requests.delete('https://graph.facebook.com/v2.1/' + self.post_id + '?access_token=' + access_token)
         return r.json()
 

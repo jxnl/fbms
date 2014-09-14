@@ -6,7 +6,9 @@ from threading import Thread
 from processing import Classifier
 
 # Define the access tokens and group_ids
-access_token = "CAAK5npFF7MYBACPwdYQRuqHwmQj18YsRDdkUiU1WfyHvs2a5AaNzyNihyqXg18UdGTyaJi9pWReXGQmJZAMtDpvOM8jqQ6c1GuvQLdKqLjvTHhyBIsYU26iLcLgUZAj4e9hnV9iyZAjwi4tr2gk5TAcNNJ71Nyctmzro1GFaikZCfVaoB42BS6AtEY6ypFZAxf6wpGUSYAjD3TMusTUeA"
+access_token = "CAAK5npFF7MYBACPwdYQRuqHwmQj18YsRDdkUiU1WfyHvs2a5AaNzyNihyqXg1\
+8UdGTyaJi9pWReXGQmJZAMtDpvOM8jqQ6c1GuvQLdKqLjvTHhyBIsYU26iLcLgUZAj4e9hnV9iyZAj\
+wi4tr2gk5TAcNNJ71Nyctmzro1GFaikZCfVaoB42BS6AtEY6ypFZAxf6wpGUSYAjD3TMusTUeA"
 group_id = '369653806521044'
 
 print "\nStarting Mark Sweep (v0.1)"
@@ -17,29 +19,42 @@ print "\n-----------------"
 queue = Queue(maxsize=0)
 num_workers = 8
 write_interval = 1.75
-print list(processing._processing.__dict__.keys())
-# clf = processing.Classifier()
+clf = Classifier()
+
+spam_threshold = .95
 
 
 # Defines the action that will be taken on a given piece of data
 def take_action(queue):
     while True:
         fb_entity = queue.get()
-        # Do the shit - JSON HERE
-        print "got a post! {}".format(fb_entity.contents)
-        msg = fb_entity.content
+        msg = fb_entity.contents
         t = clf.process(msg)
 
-        # if t['spam'][1] > .95:
-        #     fb_entity.delete_post(access_token)
-        # elif t['spam'] > 80 and not t['ontopic']:
-        #     fb_entity.post_comment('This post has been mark suspecious',
-        #                            access_token)
-        # else:
-        #     pass
+        already_commented = False
+        for comment in fb_entity.comments:
+            if comment.poster['name'] == "Mark Sweep":
+                already_commented = True
+                break
 
-        # fb_entity.post_comment("Hello, you said: {}".format(fb_entity.contents),
-        #                        access_token)
+        if not already_commented:
+            if t['spam'][1] > spam_threshold:
+                fb_entity.post_comment('Hey! It looks like this post is\
+                    probably spam, and has been marked for deletion. Please\
+                    try and remain on topic for the discussion in this\
+                    group!', access_token)
+            elif int(t['ontopic']) == 1:
+                fb_entity.post_comment('Hey, this post is on-topic with the\
+                    discussion of the group.  Grats on a great post! (y)',
+                    access_token)
+            elif t['spam'][1] > 80:
+                fb_entity.post_comment(':( We\'re not sure if this post\
+                    belongs.  It looks like spam, but not entirely.  We\'re\
+                    not sure!', access_token)
+            else:
+                pass
+        else:
+            pass
 
         queue.task_done()
 
@@ -55,12 +70,13 @@ print "-----------------\n"
 # Creates the queue writer
 writer = queue_writer.QueueWriter(access_token, group_id)
 
-# And finally, subscribe to the queue so that the program keeps running until everything is removed from the queue
+# And finally, subscribe to the queue so that the program keeps running until
+# everything is removed from the queue
 print "Subscribing to the queue, ready to accept posts/comments...\n"
 while True:
     try:
         writer.write(queue)
-        queue.join()
+        # queue.join()
 
         time.sleep(write_interval)
     except KeyboardInterrupt:

@@ -1,4 +1,5 @@
 import facebook
+
 import facebook_api
 import requests
 
@@ -16,31 +17,34 @@ class QueueWriter:
     # Always write the ID to the {@link self.ids_written} set
     # If they exist prior, don't write and skip over.
     # Queue.push(item)
-    # 
+    #
     # Don't parse into objects till later, should work fine
     def write(self, queue, max_items=30):
         posts = self.graph.get_connections(self.group_id, "feed")
-
         posts_added = 0
 
         while True:
-            if 'paging' in posts:
-                for post_raw in posts['data']:
-                    post_id = post_raw['id'].split("_")[1]
-                    if not post_id in self.ids_written:
-                        fb_post = facebook_api.FacebookPost(post_raw)
+            for post_raw in posts['data']:
+                post_id = post_raw['id'].split("_")[1]
+                if not post_id in self.ids_written:
+                    fb_post = facebook_api.FacebookPost(post_raw)
 
-                        if fb_post:
-                            posts_added = posts_added + 1
+                    if fb_post:
+                        posts_added = posts_added + 1
 
-                            if posts_added <= max_items:
-                                self.ids_written.add(post_id)
-                                queue.put(fb_post)
-                            else:
-                                return
+                        if posts_added <= max_items:
+                            self.ids_written.add(post_id)
+                            queue.put(fb_post)
                         else:
-                            return
+                            break
                     else:
-                        return
+                        break
+                else:
+                    break
 
+            if 'paging' in posts:
                 posts = requests.get(posts['paging']['next']).json()
+            else:
+                break
+
+        return
