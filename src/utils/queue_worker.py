@@ -44,18 +44,20 @@ def take_action(queue):
                     probably spam, and has been marked for deletion. Please\
                     try and remain on topic for the discussion in this\
                     group!".format(percent_spam), access_token)
-            elif int(t['ontopic']) == 1:
-                fb_entity.post_comment('Hey, this post is on-topic with the\
-                    discussion of the group.  Grats on a great post! (y)',
-                    access_token)
-            elif t['spam'][1] > .80:
-                fb_entity.post_comment(':( We\'re not sure if this post\
-                    belongs.  It looks like spam, but not entirely.  We\'re\
-                    not sure!', access_token)
             else:
-                pass
-        else:
-            pass
+                if int(t['ontopic']) == 1:
+                    fb_entity.post_comment('Hey, this post is on-topic with the\
+                        discussion of the group.  Grats on a great post! (y)',
+                        access_token)
+                elif t['spam'][1] > .80:
+                    fb_entity.post_comment(':( We\'re not sure if this post\
+                        belongs.  It looks like spam, but not entirely.  We\'re\
+                        not sure!', access_token)
+                else:
+                    fb_entity.post_comment('Uh-oh! This post doesn\'t appear\
+                        to be on-topic with the rest of the group. Please keep\
+                        discussion focused on the topic of the group.',
+                        access_token)
 
         queue.task_done()
 
