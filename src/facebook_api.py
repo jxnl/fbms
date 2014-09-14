@@ -1,9 +1,6 @@
-import datetime
-from datetime import timedelta
-
 import dateutil.parser
-import facebook
 import requests
+
 
 class FacebookPost:
     def __init__(self, post):
@@ -31,7 +28,7 @@ class FacebookPost:
         r = requests.post('https://graph.facebook.com/v2.1/' + self.post_id + '/comments?access_token=' + access_token + '&message=' + body)
         return r.json()
 
-    def delete_post(self, body, access_token):
+    def delete_post(self, access_token):
         r = requests.delete('https://graph.facebook.com/v2.1/' + self.post_id + '?access_token=' + access_token)
         return r.json()
 
