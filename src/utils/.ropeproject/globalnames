@@ -1,8 +1,0 @@
-€}q(Utraining_spam]q(UX_testqUtesting_dataqUiUdataqUclfqUspam_classiferqUyUtraining_dataqUXUy_testq	eUfeatures]q
-(U
-PHONEREGEXqUURLREGEXqUcountPhonesqUpunctuationRatioqU	PUNCREGEXqU
-WATCHWORDSqUcountURLqUcapitalizedWordCountqUnumberOfSensitiveWordsqeU
-processing]qUListMapDictqaUlistmap]qUListMapqaUfeature_data]q(U
-PHONEREGEXqUURLREGEXqUFeatureDataqU	PUNCREGEXqU
-WATCHWORDSqeUClassifiers]q(UProcessedMessageqUtopic_classifierq Uclfq!Uspam_classifierq"UtU
-Classifierq#eu.
