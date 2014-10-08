@@ -1,3 +1,5 @@
 *.csv
 *.pyc
 .ropeproject
+config.py
+__pycache__
