@@ -1,6 +1,17 @@
+# -*- coding: utf-8 -*-
+
+"""
+marksweep.facebookdao
+~~~~~~~~~~~~~~~~~~~~~
+
+this module contains the classes and methods required to simulate a
+facebook user.
+"""
+
+import facebook
+
 from config import ACCESS_TOKEN
 from utils import trim
-import facebook
 
 
 class Group(object):
@@ -16,15 +27,15 @@ class User(object):
     def __init__(self):
         self.graph = facebook.GraphAPI(ACCESS_TOKEN)
 
-    def groups(self, limit=5, get_all=False):
+    def groups(self, limit=100, get_all=False):
         response = self.graph.get_connections("me", "groups", limit=limit)
-        groups = [Group(g) for g in response["data"]]
+        groups = (Group(g) for g in response["data"])
         for grp in groups:
             yield grp
-            if response["data"]:
+            if get_all and response["data"]:
                 next_page = trim(response["paging"]["next"])
                 response = self.graph.request(next_page)
-                groups += [Group(g) for g in response["data"]]
+                groups += (Group(g) for g in response["data"])
 
 if __name__ == "__main__":
     mark = User()
