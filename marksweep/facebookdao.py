@@ -8,37 +8,46 @@ this module contains the classes and methods required to simulate a
 facebook user.
 """
 
-import facebook
-
-from config import ACCESS_TOKEN
-from utils import trim
+from utils import lazygen, DotAccess
 
 
-class Group(object):
-    def __init__(self, group_data_object):
-        for k in group_data_object:
-            self.__setattr__(str(k), str(group_data_object[k]))
+class Post(DotAccess):
+
+    def like():
+        pass
+
+    def comment(message):
+        pass
+
+    def get_number_of_likes():
+        pass
+
+    def get_number_of_comments():
+        pass
 
     def __repr__(self):
         return self.id
 
 
-class User(object):
-    def __init__(self):
-        self.graph = facebook.GraphAPI(ACCESS_TOKEN)
+class Group(DotAccess):
 
-    def groups(self, limit=100, get_all=False):
-        response = self.graph.get_connections("me", "groups", limit=limit)
-        groups = (Group(g) for g in response["data"])
-        for grp in groups:
-            yield grp
-            if get_all and response["data"]:
-                next_page = trim(response["paging"]["next"])
-                response = self.graph.request(next_page)
-                groups += (Group(g) for g in response["data"])
+    def posts(self, limit=100, all=False):
+        source, edge = self.id, "feed"
+        for post in lazygen(Post, source, edge, limit=limit, get_all=all):
+            yield post
+
+
+class User(object):
+
+    def groups(self, limit=100, all=False):
+        source, edge = "me", "groups"
+        for group in lazygen(Group, source, edge, limit=limit, get_all=all):
+            yield group
+
 
 if __name__ == "__main__":
     mark = User()
-    for group in mark.groups():
+    for group in mark.groups(2):
         print group.name
-        print group
+        for post in group.posts(2):
+            print post
