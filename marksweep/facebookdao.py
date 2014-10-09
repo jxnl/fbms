@@ -14,15 +14,23 @@ from utils import lazygen, DotAccess
 class Post(DotAccess):
 
     def like():
+        """like this post"""
         pass
 
     def comment(message):
+        """leave a message on this post"""
         pass
 
-    def get_number_of_likes():
+    def get_likes():
+        """get the set of likes on this post"""
         pass
 
-    def get_number_of_comments():
+    def get_comments():
+        """get the set of likes on this post"""
+        pass
+
+    def _delete():
+        """try to delete this post"""
         pass
 
     def __repr__(self):
@@ -31,7 +39,12 @@ class Post(DotAccess):
 
 class Group(DotAccess):
 
+    def comment(message):
+        """leave a message in this group"""
+        pass
+
     def posts(self, limit=100, all=False):
+        """return an iterable of posts"""
         source, edge = self.id, "feed"
         for post in lazygen(Post, source, edge, limit=limit, get_all=all):
             yield post
@@ -39,7 +52,16 @@ class Group(DotAccess):
 
 class User(object):
 
+    def check_user(id):
+        """obtain the profile of these users"""
+        pass
+
+    def update_status(message):
+        """update the users status"""
+        pass
+
     def groups(self, limit=100, all=False):
+        """return an interable of groups"""
         source, edge = "me", "groups"
         for group in lazygen(Group, source, edge, limit=limit, get_all=all):
             yield group
