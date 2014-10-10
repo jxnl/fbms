@@ -4,32 +4,24 @@
 marksweep.utils
 ~~~~~~~~~~~~~~~~~~~~~
 
-this module contains classes and functions that help in the development
-of the marksweet software
+this module contains functions that help our code stay DRY and simple
 """
 
-import facebook
-from config import ACCESS_TOKEN
-
-graph = facebook.GraphAPI(ACCESS_TOKEN)
-
-
-def trim(paging_url):
-    """trims the paging url to the uri"""
-    return paging_url[26:]
-
+import user
 
 def lazygen(holder, source, edges, limit=100, get_all=False):
     """lazy way to page through the content of an endpoint with a generator
 
     parameters:
     ~~~~~~~~~~
-        holder (DocAccess) - Class that wraps the content dictionary
+        graph (GraphAPI) - facbeook connection object
+        holder (FBObject) - class that wraps the content dictionary
         source (str) - source node on facebook graph
-        edge (str) - edge lable on facebook graph
+        edge (str) - edge label on facebook graph
         limit (int) - max number of posts per page
         get_all (boolean) - if true, gets all posts from an endoint
     """
+    graph = user.User.graph()
     response = graph.get_connections(source, edges, limit=limit)
     items = (holder(item) for item in response["data"])
     for item in items:
@@ -41,12 +33,6 @@ def lazygen(holder, source, edges, limit=100, get_all=False):
             items += (holder(item) for items in response["data"])
 
 
-class DotAccess(dict):
-    """light wrapper over the dictionary, allows for dotted access for
-    top level values"""
-
-    def __init__(self, group_data_object):
-        dict.__init__(self, group_data_object)
-
-    def __getattr__(self, attr):
-        return self[attr]
+def trim(paging_url):
+    """trims the paging url to the uri"""
+    return paging_url[26:]
