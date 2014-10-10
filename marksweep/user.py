@@ -26,18 +26,16 @@ class User(object):
 
     def update_status(self, message):
         """update the users status"""
-        User.graph.put_object("me", "feeds", message=message)
+        User.graph.put_object("me", "feeds", message)
 
     def inbox(self, limit=100, all=False):
         source, edge = "me", "inbox"
-        return lazygen(InboxThread, source, edge,
-                       limit=limit, get_all=all)
+        return lazygen(InboxThread, source, edge, limit, all)
 
     def groups(self, limit=100, all=False):
         """return an interable of groups"""
         source, edge = "me", "groups"
-        return lazygen(Group, source, edge,
-                       limit=limit, get_all=all)
+        return lazygen(Group, source, edge, limit, all)
 
     def _time_since_last_nap():
         return User.timer - time.time()
