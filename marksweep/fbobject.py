@@ -17,13 +17,7 @@ class FBObject(object):
 
     @classmethod
     def dot_access(cls, obj, dic):
-        """Unpythonic way to turn everything into a dot accessed object
-
-        parameters:
-        ~~~~~~~~~~
-            obj (object) - object you wish to ruin
-            dic (dict)   - dict you wish to ruin
-        """
+        """Unpythonic way to turn everything into a dot accessed object """
         for k in dic.keys():
             v = dic.get(k)
             if isinstance(v, dict):
@@ -58,6 +52,7 @@ class Comment(FBObject):
 
 
 class Post(FBObject):
+    """Produces a generator of comments in this thread obj.comments()"""
 
     def like(self):
         """like this post"""
@@ -87,6 +82,7 @@ class Post(FBObject):
 
 
 class Group(FBObject):
+    """Produces a generator of posts in this thread obj.posts()"""
 
     def comment(self, message):
         """leave a message in this group"""
@@ -107,6 +103,7 @@ class Message(FBObject):
 
 
 class InboxThread(FBObject):
+    """Produces a generator of messages in this thread obj.messages()"""
 
     def messages(self, limit=10, all=False):
         source, edge = self.id, "comments"
