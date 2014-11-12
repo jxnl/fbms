@@ -75,7 +75,7 @@ class Post(FBObject):
         """return an iterable of posts"""
         source, edge = self.id, "comments"
         return lazygen(Comment, source, edge,
-                       limit=limit, get_all=all)
+                       limit=limit, get_all=True)
 
     def _delete(self):
         User.graph().delete_object(self.id)

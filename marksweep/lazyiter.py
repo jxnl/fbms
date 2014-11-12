@@ -1,4 +1,4 @@
-import itertools
+import itertools as it
 
 
 class Iter(object):
@@ -7,31 +7,31 @@ class Iter(object):
         self._iter = iterable
 
     def map(self, f):
-        return Iter(itertools.imap(f, (self._iter)))
+        return Iter(it.imap(f, (self._iter)))
 
     def flatmap(self, f):
-        return Iter(itertools.chain(self.map(f)._iter))
+        return Iter(it.chain(self.map(f)._iter))
 
     def filter(self, f):
-        return Iter(itertools.ifilter(f, (self._iter)))
+        return Iter(it.ifilter(f, (self._iter)))
 
     def filterfalse(self, f):
-        return Iter(itertools.ifilterfalse(f, (self._iter)))
+        return Iter(it.ifilterfalse(f, (self._iter)))
 
     def takewhile(self, f):
-        return Iter(itertools.takewhile(f, (self._iter)))
+        return Iter(it.takewhile(f, (self._iter)))
 
     def dropwhile(self, f):
-        return Iter(itertools.dropwhile(f, (self._iter)))
+        return Iter(it.dropwhile(f, (self._iter)))
 
     def groupby(self, f):
-        return Iter(itertools.groupby(f, (self._iter)))
+        return Iter(it.groupby(f, (self._iter)))
 
     def chain(self, seq):
-        return Iter(itertools.chain(seq, (self._iter)))
+        return Iter(it.chain(seq, (self._iter)))
 
     def slice(self, *args):
-        return Iter(itertools.islice((self._iter), *args))
+        return Iter(it.islice((self._iter), *args))
 
     def take(self, max):
         def func(iterable):
