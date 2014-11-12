@@ -13,7 +13,7 @@ The plan is to try to detect three core properties of a post.
 
 Our current goal is to have a overall classification accuracy with 80% with a preference for low false-positive rates.
 
-## Service Orientation
+## Services
 
 The goal is to develop a series of restful services that are independent of eachother. Perhaps with Flask.
 By being loosely coupled we allow other clients to use our REST api and to build ontop of the platform.
@@ -43,7 +43,7 @@ Facebook likes. To do this will we use exponential and weighed reservoir samplin
 
 With this bootstrapped dataset we will (for each group) train a [OVA](http://en.wikipedia.org/wiki/Multiclass_classification) classifier.
 After running a [GridSearch](http://en.wikipedia.org/wiki/Hyperparameter_optimization) over the available classifiers to fine the ideal hyper parameters. 
-We have had great success with a (SVM)[http://en.wikipedia.org/wiki/Support_vector_machine] model with weighted classes using a (mono-gram/bi-gram)[http://en.wikipedia.org/wiki/N-gram] bag-of-words
+We have had great success with a [SVM](http://en.wikipedia.org/wiki/Support_vector_machine) model with weighted classes using a [(1,2)-gram](http://en.wikipedia.org/wiki/N-gram) bag-of-words
 representation of the post data.
 
 ## Spam Classification
