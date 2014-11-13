@@ -19,9 +19,12 @@ def _lazygen(holder, source, edges, limit=100, get_all=False):
         yield item
         # Lazily go to next page if required
         if get_all and response["data"]:
-            next_page = trim(response["paging"]["next"])
-            response = graph.request(next_page)
-            items += (holder(item) for items in response["data"])
+            try:
+                next_page = trim(response["paging"]["next"])
+                response = graph.request(next_page)
+                items += (holder(item) for items in response["data"])
+            except:
+                pass
 
 
 def lazygen(holder, source, edges, limit, get_all):

@@ -18,6 +18,7 @@ class User(object):
         if cls.call_counter > 600:
             time.sleep(10)
             User.timer = time.time()
+            cls.call_counter = 0
         return User.__graph
 
     def __init__(self):
