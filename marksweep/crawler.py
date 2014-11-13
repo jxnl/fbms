@@ -2,8 +2,6 @@
 marksweep.crawler
 ~~~~~~~~~~~~~~~~~~
 
-This crawler will crawl the entire
-
 """
 
 import user
