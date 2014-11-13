@@ -51,6 +51,15 @@ class FBObject(object):
         return temp
 
 
+class Like(FBObject):
+
+    def persist(self, props=None):
+        temp = {}
+        temp["from_id"] = self.data["id"]
+        temp["from_name"] = self.data["name"]
+        return temp
+
+
 class Comment(FBObject):
 
     props = ["id", "like_count", "message", "created_time"]
@@ -65,7 +74,7 @@ class Comment(FBObject):
 
     def _likes(self, limit=100, all=True):
         source, edge = self.id, "likes"
-        return lazygen(FBObject, source, edge,
+        return lazygen(Like, source, edge,
                        limit=limit, get_all=all)
 
     def persist(self, props=props):
@@ -94,6 +103,10 @@ class Post(FBObject):
     def user(self):
         return self.__dict__["from"]
 
+    @property
+    def _id(self):
+        return self.data["id"].split("_")[-1]
+
     def leave_comment(self, message):
         """leave a message on this post"""
         User.graph().put_comment(self.id, message)
@@ -105,7 +118,7 @@ class Post(FBObject):
 
     def _likes(self, limit=100, all=True):
         source, edge = self.id, "likes"
-        return lazygen(FBObject, source, edge,
+        return lazygen(Like, source, edge,
                        limit=limit, get_all=all)
 
     def _delete(self):
