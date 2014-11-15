@@ -30,8 +30,8 @@ class Iter(object):
     def chain(self, seq):
         return Iter(it.chain(seq, (self._iter)))
 
-    def slice(self, *args):
-        return Iter(it.islice((self._iter), *args))
+    def slice(self, *idxs):
+        return Iter(it.islice((self._iter), *idxs))
 
     def take(self, max):
         def func(iterable):

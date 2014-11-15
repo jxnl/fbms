@@ -126,13 +126,14 @@ class Post(FBObject):
 
     def persist(self, props=props):
         temp = super(Post, self).persist(props)
-        temp["from_name"] = self.data["from"]["name"]
-        temp["from_id"] = self.data["from"]["id"]
+        try:
+            temp["from_name"] = self.data["from"]["name"]
+            temp["from_id"] = self.data["from"]["id"]
+        except KeyError:
+            pass
         try:
             temp["message_tags"] = map(lambda p: int(p["id"]),
                                        self.data["message_tags"]["0"])
-        except KeyError:
-            pass
         return temp
 
 

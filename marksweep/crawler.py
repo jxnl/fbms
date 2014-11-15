@@ -20,6 +20,7 @@ if __name__ == "__main__":
     mark = user.User()
     HHackers = mark.groups().filter(
         lambda g: "hack" in g.name.lower() or "hh" in g.name.lower())
+        #lambda g: int(g.id) == 794333857297838)
 
     for group in HHackers:
         group_obj = group.persist()
@@ -31,7 +32,7 @@ if __name__ == "__main__":
         LOG.info("Persisted {} with id {} at time {}".format(
             group.name, group.id, datetime.datetime.now()
         ))
-        for post in group._posts(limit=300):
+        for post in group._posts(limit=300).take(300):
             post_obj = post.persist()
             post_obj["group_id"] = current_group_id
             # Define Context, _id is to remove the GID_PID problem

@@ -16,7 +16,7 @@ class User(object):
         """return the graph object and watch rate limiting"""
         cls.call_counter += 1
         if cls.call_counter > 600:
-            time.sleep(20)
+            time.sleep(60)
             User.timer = time.time()
             cls.call_counter = 0
         return User.__graph

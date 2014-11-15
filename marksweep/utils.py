@@ -14,11 +14,7 @@ from lazyiter import Iter
 
 def _lazygen(holder, source, edges, limit=100, get_all=False):
     graph = user.User.graph()
-    try:
-        response = graph.get_connections(source, edges, limit=limit)
-    except:
-        time.sleep(60)
-        response = graph.get_connections(source, edges, limit=limit)
+    response = graph.get_connections(source, edges, limit=limit)
     items = (holder(item) for item in response["data"])
     for item in items:
         yield item
@@ -26,10 +22,7 @@ def _lazygen(holder, source, edges, limit=100, get_all=False):
         if get_all and response["data"]:
             try:
                 next_page = trim(response["paging"]["next"])
-                try:
-                    response = graph.request(next_page)
-                except:
-                    time.sleep(60)
+                response = graph.request(next_page)
                 items += (holder(item) for items in response["data"])
             except:
                 pass
