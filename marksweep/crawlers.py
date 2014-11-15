@@ -153,7 +153,6 @@ class GroupCrawlerBFS(AbstractBaseCrawler):
         super(GroupCrawlerBFS, self).__init__(name)
         self.group_queue = Queue()
         self.posts_queue = Queue()
-        self.posts_queue = Queue()
         self.LOG = logging.getLogger("bfs-crawler : {}".format(name))
 
     def crawl(self, lim=100):
