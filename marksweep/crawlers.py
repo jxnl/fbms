@@ -2,6 +2,7 @@
 
 """
 marksweep.group-crawler-dfs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This modules contains a crawler that will traverse the facebook graph depth-first and persist
 all groups, posts, comments and likes.
