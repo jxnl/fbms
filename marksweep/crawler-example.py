@@ -1,14 +1,22 @@
+# -*- coding: utf-8 -*-
+
 """
-marksweep.crawler
+marksweep.crawler-example
 ~~~~~~~~~~~~~~~~~~
 
 """
 
-import user
+__author__ = 'JasonLiu'
+
+
 import logging
+
+import facebook_user
 import datetime
 import time
+# noinspection PyUnresolvedReferences,PyUnresolvedReferences
 from pymongo import MongoClient
+
 
 logging.basicConfig(filename="../logs/crawler.log",
                     level=logging.DEBUG)
@@ -17,7 +25,7 @@ if __name__ == "__main__":
     DAO = MongoClient().hackathonhackers
     LOG = logging.getLogger("crawler")
 
-    mark = user.User()
+    mark = facebook_user.User()
     HHackers = mark.groups().filter(
         lambda g: "hack" in g.name.lower() or "hh" in g.name.lower())
         #lambda g: int(g.id) == 794333857297838)
@@ -32,18 +40,18 @@ if __name__ == "__main__":
         LOG.info("Persisted {} with id {} at time {}".format(
             group.name, group.id, datetime.datetime.now()
         ))
-        for post in group._posts(limit=300).take(300):
+        for post in group.posts_(limit=300).take(300):
             post_obj = post.persist()
             post_obj["group_id"] = current_group_id
-            # Define Context, _id is to remove the GID_PID problem
-            current_post_id = post._id
+            # Define Context, id_ is to remove the GID_PID problem
+            current_post_id = post.id_
             producer_id = post_obj["from_id"]
             # save and log action
             DAO.posts.save(post_obj)
             LOG.info("Persisted post with id {} at time {}".format(
                 current_post_id, datetime.datetime.now()
             ))
-            for comment in post._comments(limit=300):
+            for comment in post.comments_(limit=300):
                 comment_obj = comment.persist()
                 comment_obj["group_id"] = current_group_id
                 comment_obj["post_id"] = current_post_id
@@ -54,7 +62,7 @@ if __name__ == "__main__":
                 LOG.info("Persisted comment with id {} at time {}".format(
                     current_comment_id, datetime.datetime.now()
                 ))
-            for like in post._likes(300):
+            for like in post.likes_(300):
                 like_obj = like.persist()
                 like_obj["group_id"] = current_group_id
                 like_obj["post_id"] = current_post_id

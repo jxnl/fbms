@@ -4,16 +4,36 @@
 marksweep.utils
 ~~~~~~~~~~~~~~~~~~~~~
 
-this module contains functions that help our code stay DRY and simple
+this module contains functions that help our code stay DRY.
+
+contents:
+    lazygen - consumes Facebook Graph properties and returns generators
+    that contains the desired nodes or edges. The generator also handles
+    pagination when required.
 """
 
-import user
-import time
+__author__ = 'JasonLiu'
+
+import facebook_user
 from lazyiter import Iter
 
 
+def lazygen(holder, source, edges, limit, get_all):
+    """
+    Lazy generator that abstracts the pagination of GraphAPI responses.
+
+    :param edges: str - edge label on facebook graph
+    :param source: str - source label on facebook graph
+    :param holder: FBObject - class that wraps the resulting node dict
+    :param limit: int - maximum number of objects per page
+    :param get_all: bool - paginate through everything if needed
+    :return: generator of containing elements of type `holder`
+    """
+    return Iter(_lazygen(holder, source, edges, limit, get_all))
+
+
 def _lazygen(holder, source, edges, limit=100, get_all=False):
-    graph = user.User.graph()
+    graph = facebook_user.User.graph()
     response = graph.get_connections(source, edges, limit=limit)
     items = (holder(item) for item in response["data"])
     for item in items:
@@ -24,23 +44,8 @@ def _lazygen(holder, source, edges, limit=100, get_all=False):
                 next_page = trim(response["paging"]["next"])
                 response = graph.request(next_page)
                 items += (holder(item) for items in response["data"])
-            except:
+            except KeyError:
                 pass
-
-
-def lazygen(holder, source, edges, limit, get_all):
-    """lazy way to page through the content of an endpoint with a generator
-
-    parameters:
-    ~~~~~~~~~~
-        graph (GraphAPI) - facbeook connection object
-        holder (FBObject) - class that wraps the content dictionary
-        source (str) - source node on facebook graph
-        edge (str) - edge label on facebook graph
-        limit (int) - max number of posts per page
-        get_all (boolean) - if true, gets all posts from an endoint
-    """
-    return Iter(_lazygen(holder, source, edges, limit, get_all))
 
 
 def trim(paging_url):
