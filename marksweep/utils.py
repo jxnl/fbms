@@ -2,7 +2,7 @@
 
 """
 marksweep.utils
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 this module contains functions that help our code stay DRY.
 
