@@ -90,12 +90,10 @@ class AbstractBaseCrawler(object):
         comment_obj = comment.persist()
         comment_obj["group_id"] = group_id
         comment_obj["post_id"] = post_id
-        # Define Context
         current_comment_id = comment_obj["id"]
         # save and log action
         self.DAO.comments.save(comment_obj)
-        # noinspection PyUnresolvedReferences
-        self.OG.info("Persisted comment with id {} at time {}".format(
+        self.OG.info("[COMMENT] (id={},time={})".format(
             current_comment_id, datetime.datetime.now()
         ))
 
@@ -114,7 +112,7 @@ class AbstractBaseCrawler(object):
         # save and log action
         self.DAO.likes.save(like_obj)
         # noinspection PyUnresolvedReferences
-        self.LOG.info("Persisted post-like with id {} at time {}".format(
+        self.LOG.info("[POST-LIKE] (id={},time={})".format(
             post_id, datetime.datetime.now()
         ))
 
@@ -153,7 +151,6 @@ class GroupCrawlerBFS(AbstractBaseCrawler):
         super(GroupCrawlerBFS, self).__init__(name)
         self.group_queue = Queue()
         self.posts_queue = Queue()
-        self.posts_queue = Queue()
         self.LOG = logging.getLogger("bfs-crawler : {}".format(name))
 
     def crawl(self, lim=100):
@@ -161,6 +158,7 @@ class GroupCrawlerBFS(AbstractBaseCrawler):
         This crawl will traverse the Facebook graph breadth first with respect
         to posts and then and persist all FBObjects
 
+        :rtype : void
         :param lim: total number of posts to get per page.
         :return:
         """
