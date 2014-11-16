@@ -3,3 +3,5 @@
 .ropeproject
 config.py
 __pycache__
+logs/
+marksweep/nohup.out

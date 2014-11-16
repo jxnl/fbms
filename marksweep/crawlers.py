@@ -32,12 +32,17 @@ class AbstractBaseCrawler(object):
         self.name = name
         self.user = facebook_user.User()
         # noinspection PyUnresolvedReferences
-        self.groups = mark.groups(limit=1000).filter(
+        self.groups = self.user.groups(limit=1000).filter(
             lambda _: "hack" in _.name.lower() or "hh" in _.name.lower()
         )
         self.DAO = MongoClient().hackathonhackers
         self.LOG = logging.getLogger("bfs-crawler : {}".format(name))
         self.get_all_posts = False
+
+    def update_groups(self):
+        self.groups = self.user.groups(limit=1000).filter(
+            lambda _: "hack" in _.name.lower() or "hh" in _.name.lower()
+        )
 
     def get_all_posts(self):
         """
@@ -94,7 +99,7 @@ class AbstractBaseCrawler(object):
         current_comment_id = comment_obj["id"]
         # save and log action
         self.DAO.comments.save(comment_obj)
-        self.OG.info("[COMMENT] (id={},time={})".format(
+        self.LOG.info("[COMMENT] (id={},time={})".format(
             current_comment_id, datetime.datetime.now()
         ))
 
@@ -172,24 +177,24 @@ class GroupCrawlerBFS(AbstractBaseCrawler):
         # For each group get the first 100 posts
         # Push each post onto the queue
         while not self.group_queue.empty():
-            for group in self.group_queue.get():
-                self.LOG.info("[QUEUEING POST NODES] {}".format(datetime.datetime.now()))
-                for post in group.posts_(limit=lim, all=self.get_all_posts):
-                    self.posts_queue.put(post)
+            group = self.group_queue.get()
+            self.LOG.info("[QUEUEING POST NODES] {}".format(datetime.datetime.now()))
+            for post in group.posts_(limit=lim, all=self.get_all_posts):
+                self.posts_queue.put(post)
 
         self.LOG.info("[VISITING POST NODES] {}".format(datetime.datetime.now()))
         # For each post from the queue
         # Persist all comments and likes
         while not self.posts_queue.empty():
-            for post in self.posts_queue.get():
-                current_post_id = int(post.id_)
-                current_group_id = int(post.group_id_)
-                self._crawl_group_post(post, current_group_id)
-                # Comments and Likes are crawled depth first
-                self.LOG.info("[VISITING COMMENT NODES] {}".format(datetime.datetime.now()))
-                for comment in post.comments_(limit=500, all=True):
-                    self._crawl_post_comments(comment, current_group_id, current_post_id)
-                self.LOG.info("[VISITING LIKE NODES] {}".format(datetime.datetime.now()))
-                for like in post.likes_(limit=500, all=True):
-                    self._crawl_post_likes(like, current_group_id, current_post_id)
+            post = self.posts_queue.get()
+            current_post_id = int(post.id_)
+            current_group_id = int(post.group_id_)
+            self._crawl_group_post(post, current_group_id)
+            # Comments and Likes are crawled depth first
+            self.LOG.info("[VISITING COMMENT NODES] {}".format(datetime.datetime.now()))
+            for comment in post.comments_(limit=500, all=True):
+                self._crawl_post_comments(comment, current_group_id, current_post_id)
+            self.LOG.info("[VISITING LIKE NODES] {}".format(datetime.datetime.now()))
+            for like in post.likes_(limit=500, all=True):
+                self._crawl_post_likes(like, current_group_id, current_post_id)
         self.LOG.info("[JOB COMPLETED] {}".format(datetime.datetime.now()))

@@ -16,7 +16,7 @@ from the Graph API along with posting a status to their news feed.
 __author__ = 'JasonLiu'
 
 from fbobject import *
-
+from time import sleep, time
 from config import APP_SECRET, APP_ID, ACCESS_TOKEN
 from utils import lazygen
 from facebook import GraphAPI
@@ -31,15 +31,14 @@ class User(object):
     def graph(cls):
         cls.call_counter += 1
         if cls.call_counter > 600 and cls._time_since_last_nap() > 600:
-            time.sleep(60)
-            # noinspection PyCallingNonCallable
-            User.timer = time.time()
+            sleep(60)
+            User.timer = time()
             cls.call_counter = 0
         return User.__graph
 
     def __init__(self):
         User.__graph.extend_access_token(APP_ID, APP_SECRET)
-        User.timer = time.time()
+        User.timer = time()
 
     @staticmethod
     def update_status(message):
@@ -58,4 +57,4 @@ class User(object):
     @classmethod
     def _time_since_last_nap(cls):
         # noinspection PyUnresolvedReferences
-        return time.time() - cls.timer
+        return time() - cls.timer

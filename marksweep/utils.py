@@ -43,7 +43,7 @@ def _lazygen(holder, source, edges, limit=100, get_all=False):
             try:
                 next_page = trim(response["paging"]["next"])
                 response = graph.request(next_page)
-                items += (holder(item) for items in response["data"])
+                items = (holder(item) for items in response["data"])
             except KeyError:
                 pass
 

@@ -79,7 +79,6 @@ class Like(FBObject):
         return persistable_dict
 
 
-# noinspection PyUnresolvedReferences,PyUnresolvedReferences
 class Comment(FBObject):
     props = ["id", "like_count", "message", "created_time"]
 
@@ -117,8 +116,11 @@ class Comment(FBObject):
         :return:
         """
         persistable_dict = super(Comment, self).persist(props)
-        persistable_dict["from_name"] = self.data["from"]["name"]
-        persistable_dict["from_id"] = self.data["from"]["id"]
+        try:
+            persistable_dict["from_name"] = self.data["from"]["name"]
+            persistable_dict["from_id"] = self.data["from"]["id"]
+        except KeyError:
+            pass
         try:
             persistable_dict["message_tags"] = map(
                 lambda p: int(p["id"]), self.data["message_tags"]
@@ -128,7 +130,6 @@ class Comment(FBObject):
         return persistable_dict
 
 
-# noinspection PyUnresolvedReferences,PyUnresolvedReferences,PyUnresolvedReferences,PyUnresolvedReferences,PyUnresolvedReferences
 class Post(FBObject):
     props = ["id", "message", "caption", "updated_time", "created_time", "like_count", "type"]
 
@@ -215,7 +216,6 @@ class Post(FBObject):
         return persistable_dict
 
 
-# noinspection PyUnresolvedReferences,PyUnresolvedReferences
 class Group(FBObject):
     props = ["id", "name"]
 
