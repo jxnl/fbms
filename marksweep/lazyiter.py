@@ -9,7 +9,9 @@ Example:
 
 __author__ = "Jason Liu"
 
+from copy import deepcopy
 from heapq import heapreplace, heapify
+from collections import defaultdict
 
 import itertools as it
 
@@ -22,7 +24,6 @@ class Iter(object):
         """
         Make an iterator that computes the function using arguments from each of the iterables.
 
-        :rtype : Iter
         :param func, a -> b:
         :return:
         """
@@ -32,7 +33,6 @@ class Iter(object):
         """
         Make an interator that returns elements from the lists produced by mapping function_to_list.
 
-        :rtype : Iter
         :param function_to_list, a -> [b...]:
         :return:
         """
@@ -43,7 +43,6 @@ class Iter(object):
         Make an iterator that filters elements from iterable returning only those for which the predicate is True.
         If predicate is None, return the items that are true.
 
-        :rtype : Iter
         :param predicate, a -> bool:
         :return:
         """
@@ -54,7 +53,6 @@ class Iter(object):
         Make an iterator that filters elements from iterable returning only those for which the predicate is False.
         If predicate is None, return the items that are false
 
-        :rtype : Iter
         :param predicate, a -> bool:
         :return:
         """
@@ -64,7 +62,6 @@ class Iter(object):
         """
         Make an iterator that returns elements from the iterable as long as the predicate is true.
 
-        :rtype : Iter
         :param predicate, a -> bool:
         :return:
         """
@@ -72,30 +69,82 @@ class Iter(object):
 
     def dropwhile(self, predicate):
         """
-        Make an iterator that drops elements from the iterable as long as the predicate is true;
-        afterwards, returns every element.
+        Make an iterator that drops elements from the iterable as long as the predicate is true
 
         Note, the iterator does not produce any output until the predicate first becomes false,
         so it may have a lengthy start-up time.
 
-        :rtype : Iter
-        :param predicate, a -> bool:
+        :param predicate:
         :return:
         """
         return Iter(it.dropwhile(predicate, self._iter))
 
-    def groupby(self, keyfunc):
+    def groupby(self, keyfunc=None, valfunc=None):
         """
         Make an iterator that returns consecutive keys and groups from the iterable.
-        The key is a function computing a key value for each element.
-        If not specified or is None, key defaults to an identity function and returns
-        the element unchanged.
+        The key and value is computed each element by keyfunc and valfunc.
+        If these functions are not not specified or is None, they default to identity function.
 
         :rtype : Iter
-        :param keyfunc, a -> b:
+        :param keyfunc:
+        :param valfunc:
         :return:
         """
-        return Iter(it.groupby(self._iter, keyfunc))
+
+        if not keyfunc:
+            keyfunc = lambda e: e
+
+        if not valfunc:
+            valfunc = lambda e: e
+
+        def func(iterable, keyfunc_, valfunc_):
+            group_by_collection = defaultdict(list)
+            for element in iterable:
+                (key, value) = (keyfunc_(element), valfunc_(element))
+                group_by_collection[key].append(value)
+            for k, v in group_by_collection:
+                yield (k, v)
+        return Iter(func(self._iter, keyfunc, valfunc))
+
+    def reduce(self, reducing_function, initial=None):
+        """
+        Get a merged value using an associative reduce function,
+        so as to reduce the iterable to a single value from left to right.
+
+        :param reducing_function:
+        :param initial:
+        :return:
+        """
+        return reduce(reducing_function, self._iter, initial=initial)
+
+    def reduce_by_key(self, reducing_function, keyfunc=lambda (k, _): k,
+                      valfunc=lambda (_, v): v, initial=None):
+        """
+        Make an iterator that returns the merged values for each key using an associative reduce function.
+        The default key and values are the (k,v) values of a 2-tuple.
+
+        :rtype: Iter
+        :param reducing_function:
+        :param keyfunc:
+        :param valfunc:
+        :param initial:
+        :return:
+        """
+        return self.groupby(keyfunc, valfunc)\
+                   .map(lambda (k, v):
+                       (k, reduce(reducing_function, v, initial)))
+
+    def union(self, *iterable):
+        """
+        Make an iterator that returns elements from the first iterable until it
+        is exhausted, then proceeds to the next iterable, until all of the iterables
+        are exhausted. Used for treating consecutive sequences as a single sequence.
+
+        :rtype Iter:
+        :param iterable:
+        :return:
+        """
+        return Iter(it.chain(self._iter, *iterable))
 
     def chain(self, iterable):
         """Make an iterator that returns elements from the first iterable until it
@@ -107,7 +156,7 @@ class Iter(object):
         :param iterable:
         :return:
         """
-        return Iter(it.chain(self._iter, iterable))
+        return self.union(self, iterable)
 
     def slice(self, *args):
         """
@@ -190,28 +239,58 @@ class Iter(object):
 
     def distinct(self):
         """
-        Return only the distinct elements of the iterable.
+        Make an iterator with only the distinct elements of the previous.
 
+        :rtype : Iter
         :return:
         """
 
         def func(iterable):
             # This iterator simply puts elements into a set and looks for
             # simple set membership. Bloom filter implementation may be of interest
-            distinct_values = set()
+            set_of_distinct_values = set()
             for i in iterable:
-                if i not in distinct_values:
-                    distinct_values.add(i)
+                if i not in set_of_distinct_values:
+                    set_of_distinct_values.add(i)
                     yield i
+        return Iter(func(self._iter))
+
+    def distinct_approx(self, init_cap=200, err_rate=0.001):
+        """
+        Make an iterator with only the distinct elements of the previous.
+        Uses a Bloom filter for better space efficiency at the cost of false positive
+
+        :return:
+        """
+        from pybloom import ScalableBloomFilter
+
+        def func(iterable):
+            # This iterator uses a Bloom filter to check for uniqueness, much more memory efficient
+            set_of_distinct_values = ScalableBloomFilter(init_cap, err_rate)
+            for element in iterable:
+                if element not in set_of_distinct_values:
+                    set_of_distinct_values.add(element)
+                    yield element
         return Iter(func(self._iter))
 
     def collect(self):
         """
         Collect the iterable back into a list.
 
+        :rtype : list
         :return:
         """
         return list(self._iter)
+
+    def copy_current_state(self):
+        """
+        Clone the iterable to produce a deepcopy. This may be desired if we wish
+        to maintain the state of the iterator while also calling a method with side effects.
+
+        :rtype : Iter
+        :return:
+        """
+        return deepcopy(self);
 
     def __iter__(self):
         return self._iter
