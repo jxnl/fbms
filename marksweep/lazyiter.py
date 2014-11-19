@@ -95,7 +95,7 @@ class Iter(object):
         :param keyfunc, a -> b:
         :return:
         """
-        return Iter(it.groupby(keyfunc, self._iter))
+        return Iter(it.groupby(self._iter, keyfunc))
 
     def chain(self, iterable):
         """Make an iterator that returns elements from the first iterable until it
