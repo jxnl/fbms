@@ -1,0 +1,3 @@
+[submodule "fbms-crawler"]
+	path = fbms-crawler
+	url = https://github.com/jxnl/fbms-crawler
